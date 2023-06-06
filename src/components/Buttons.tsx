@@ -4,8 +4,13 @@ import {DefaultText} from './Texts';
 export function DefaultButton(props: any): JSX.Element {
   return (
     <TouchableOpacity
-      style={[buttonStyles.default, props.style]}
-      onPress={props.onPress}>
+      style={[
+        buttonStyles.default,
+        props.style,
+        {opacity: props.disabled ? 0.2 : 1},
+      ]}
+      onPress={props.onPress}
+      disabled={props.disabled}>
       <DefaultText style={{color: 'white', fontWeight: 'bold'}}>
         {props.children}
       </DefaultText>

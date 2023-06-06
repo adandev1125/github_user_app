@@ -7,7 +7,12 @@ import {useGithubProfileApi} from '../hooks/api';
 
 function Profile(this: any, props: any): JSX.Element {
   const [username, setUsername] = useState('');
-  const {loading, user, error} = useGithubProfileApi(username);
+  const {
+    loading,
+    user,
+    error,
+    refresh: refreshProfile,
+  } = useGithubProfileApi(username);
 
   useEffect(() => {
     setUsername(props.route.params.username);
@@ -26,6 +31,10 @@ function Profile(this: any, props: any): JSX.Element {
     [user],
   );
 
+  const onRefresh = useCallback(() => {
+    refreshProfile();
+  }, [refreshProfile]);
+
   return (
     <DefaultPageWrapper>
       <ScrollView
@@ -35,6 +44,7 @@ function Profile(this: any, props: any): JSX.Element {
           <RefreshControl
             progressBackgroundColor={colors.gray}
             refreshing={loading}
+            onRefresh={onRefresh}
           />
         }>
         <GitHubUser

@@ -17,8 +17,8 @@ const Stack = createNativeStackNavigator();
 function App(): JSX.Element {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={Home} />
+      <Stack.Navigator initialRouteName="Search GitHub User">
+        <Stack.Screen name="Search GitHub User" component={Home} />
         <Stack.Screen
           name="Follows"
           component={Follows}

@@ -7,6 +7,7 @@ export const useGithubProfileApi = (username: string) => {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any | null>(null);
   const [error, setError] = useState('');
+  const [shouldRefresh, refresh] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,9 +35,16 @@ export const useGithubProfileApi = (username: string) => {
     };
 
     if (username.length > 0) fetchData();
-  }, [username]);
+  }, [username, shouldRefresh]);
 
-  return {loading, user, error};
+  return {
+    loading,
+    user,
+    error,
+    refresh: () => {
+      refresh({});
+    },
+  };
 };
 
 export const useGithubFollowsApi = (
@@ -59,7 +67,11 @@ export const useGithubFollowsApi = (
             ...githubHeader,
           },
         );
-        setUsers([...users, ...data]);
+        if (data.length === 0) {
+          ToastAndroid.show('Nothing to show', ToastAndroid.LONG);
+        } else {
+          setUsers([...users, ...data]);
+        }
       } catch (error: any) {
         ToastAndroid.show(error.message, ToastAndroid.LONG);
       } finally {

@@ -23,13 +23,14 @@ function Follows(this: any, props: any): JSX.Element {
   }, []);
 
   const renderFooterItem = () => {
-    if (loading) {
+    if (users.length === 0) {
       return <></>;
     } else {
       return (
         <DefaultButton
           style={{alignSelf: 'center', marginBottom: 20}}
-          onPress={onLoadMorePress}>
+          onPress={onLoadMorePress}
+          disabled={loading}>
           Load More
         </DefaultButton>
       );
