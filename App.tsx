@@ -6,8 +6,9 @@
  */
 
 import {NavigationContainer} from '@react-navigation/native';
-import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import React from 'react';
+import Follows from './src/pages/Follows';
 import Home from './src/pages/Home';
 
 const Stack = createNativeStackNavigator();
@@ -17,6 +18,8 @@ function App(): JSX.Element {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="Followers" component={Follows} />
+        <Stack.Screen name="Following" component={Follows} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,4 +1,5 @@
-import React, {useCallback, useRef, useState} from 'react';
+import axios from 'axios';
+import React, {useCallback, useState} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -6,17 +7,24 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import {DefaultTextIinput} from '../components/TextInputs';
-import axios from 'axios';
 import {GitHubUser} from '../components/GithubUser';
+import {DefaultTextIinput} from '../components/TextInputs';
+import {githubHeader} from '../config/api';
 
-function Home(): JSX.Element {
+function Home(props: any): JSX.Element {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
 
   const onChangeUsername = useCallback((username: string) => {
     fetchData(username).then();
+  }, []);
+
+  const onFollowerPress = useCallback(() => {
+    props.navigation.push('Followers');
+  }, []);
+  const onFollowingPress = useCallback(() => {
+    props.navigation.push('Following');
   }, []);
 
   const fetchData = async (username: string) => {
@@ -28,6 +36,7 @@ function Home(): JSX.Element {
       try {
         const {data} = await axios.get(
           `https://api.github.com/users/${username}`,
+          githubHeader,
         );
         setUser(data);
       } catch (error: any) {
@@ -52,14 +61,20 @@ function Home(): JSX.Element {
       <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false}>
         <View style={{flexDirection: 'row', marginBottom: 50}}>
           <DefaultTextIinput
-            afterDelay={800}
+            afterDelay={500}
             maxLength={50}
-            placeholder={'Enter username. (ex: adan)'}
+            placeholder={'Enter GitHub username. (ex: adan)'}
             onAfterChangeText={onChangeUsername}
           />
         </View>
 
-        <GitHubUser loading={loading} user={user} error={error} />
+        <GitHubUser
+          loading={loading}
+          user={user}
+          error={error}
+          onFollowerPress={onFollowerPress}
+          onFollowingPress={onFollowingPress}
+        />
       </ScrollView>
     </SafeAreaView>
   );

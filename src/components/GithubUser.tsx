@@ -6,11 +6,25 @@ import {
   View,
 } from 'react-native';
 import {DefaultText, BigText, LargeText} from './Texts';
+import {colors} from '../config/colors';
+
+function FCountButton(props: any) {
+  return (
+    <TouchableOpacity
+      style={[{flexDirection: 'row'}, props.style]}
+      onPress={props.onPress}>
+      <DefaultText style={{fontWeight: 'bold'}}>{props.count}</DefaultText>
+      <DefaultText style={{color: colors.gray}}> {props.label}</DefaultText>
+    </TouchableOpacity>
+  );
+}
 
 export function GitHubUser(props: {
   error: string;
   loading: boolean;
   user: any;
+  onFollowerPress: Function;
+  onFollowingPress: Function;
 }): JSX.Element {
   console.log(props);
   if (props.loading) {
@@ -37,7 +51,7 @@ export function GitHubUser(props: {
           {props.user.name}
         </LargeText>
 
-        <BigText style={{color: '#888888', marginBottom: 20}}>
+        <BigText style={{color: colors.gray, marginBottom: 20}}>
           {props.user.login}
         </BigText>
 
@@ -46,19 +60,17 @@ export function GitHubUser(props: {
         </DefaultText>
 
         <View style={{flexDirection: 'row', alignSelf: 'center'}}>
-          <TouchableOpacity style={{marginRight: 20}}>
-            <DefaultText style={{fontWeight: 'bold'}}>
-              {props.user.followers}
-            </DefaultText>
-            <DefaultText style={{color: '#888888'}}> followers</DefaultText>
-          </TouchableOpacity>
-
-          <TouchableOpacity>
-            <DefaultText style={{fontWeight: 'bold'}}>
-              {props.user.following}
-            </DefaultText>
-            <DefaultText style={{color: '#888888'}}> following</DefaultText>
-          </TouchableOpacity>
+          <FCountButton
+            style={{marginRight: 20}}
+            count={props.user.followers}
+            label={'followers'}
+            onPress={props.onFollowerPress}
+          />
+          <FCountButton
+            count={props.user.following}
+            label={'following'}
+            onPress={props.onFollowingPress}
+          />
         </View>
       </View>
     );
