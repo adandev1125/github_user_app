@@ -1,6 +1,7 @@
 import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {colors} from '../config/colors';
 import {BigText, DefaultText, LargeText} from './Texts';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
 function FCountButton(props: any) {
   return (
@@ -16,9 +17,25 @@ function FCountButton(props: any) {
 export function GitHubUser(props: {
   error: string;
   user: any;
+  loading: boolean;
   onFollowerPress: Function;
   onFollowingPress: Function;
 }): JSX.Element {
+  if (props.loading) {
+    return (
+      <SkeletonPlaceholder>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <View style={{width: 50, height: 50, borderRadius: 25}} />
+          <View style={{marginLeft: 20}}>
+            <View style={{width: 120, height: 20, borderRadius: 4}} />
+            <View
+              style={{marginTop: 6, width: 80, height: 20, borderRadius: 4}}
+            />
+          </View>
+        </View>
+      </SkeletonPlaceholder>
+    );
+  }
   if (props.error.length > 0) {
     return (
       <DefaultText style={{alignSelf: 'center', color: '#888888'}}>

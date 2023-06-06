@@ -1,26 +1,68 @@
 import axios from 'axios';
-import {useState, useEffect} from 'react';
+import {useEffect, useState, useRef, useCallback} from 'react';
 import {ToastAndroid} from 'react-native';
 import {githubHeader} from '../config/api';
+import {useDispatch, useSelector} from 'react-redux';
+import cacheSlice from '../reducers/cache';
 
-export const useGithubProfileApi = (username: string) => {
+export const useGithubProfileApi = (username: string, navigation: any) => {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any | null>(null);
   const [error, setError] = useState('');
   const [shouldRefresh, refresh] = useState({});
 
+  const previousShouldRefresh = useRef({});
+
+  const cache = useSelector((state: any) => state.cache.profileCache);
+  const dispatch = useDispatch();
+
+  const onFollowsPress = useCallback(
+    (type: string) => {
+      if (user === null) return;
+      navigation.push('Follows', {
+        type: type,
+        count: user[type],
+        name: user.name === null ? user.login : user.name,
+        login: user.login,
+      });
+    },
+    [user],
+  );
+
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
-      setUser(null);
-      setError('');
+      const cachedUser = cache[username];
 
-      if (username.length > 0) {
+      const shouldRefreshChanged =
+        previousShouldRefresh.current !== shouldRefresh;
+
+      const mustFetch =
+        cachedUser === undefined ||
+        (Date.now() - cachedUser.time) / 6e6 > 10 ||
+        shouldRefreshChanged;
+
+      if (shouldRefreshChanged) {
+        previousShouldRefresh.current = shouldRefresh;
+      }
+
+      if (mustFetch) {
+        setLoading(true);
+        setUser(null);
+        setError('');
+
         try {
           const {data} = await axios.get(
             `https://api.github.com/users/${username}`,
             githubHeader,
           );
+
+          dispatch(
+            cacheSlice.actions.updateProfileCache({
+              username: username,
+              data,
+            }),
+          );
+
           setUser(data);
         } catch (error: any) {
           if (error.response.status === 404) {
@@ -29,8 +71,10 @@ export const useGithubProfileApi = (username: string) => {
             setError(error.message);
           }
         } finally {
-          setLoading(false);
+          // setLoading(false);
         }
+      } else {
+        setUser(cachedUser);
       }
     };
 
@@ -44,6 +88,7 @@ export const useGithubProfileApi = (username: string) => {
     refresh: () => {
       refresh({});
     },
+    onFollowsPress,
   };
 };
 

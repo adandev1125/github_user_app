@@ -12,24 +12,12 @@ function Profile(this: any, props: any): JSX.Element {
     user,
     error,
     refresh: refreshProfile,
-  } = useGithubProfileApi(username);
+    onFollowsPress,
+  } = useGithubProfileApi(username, props.navigation);
 
   useEffect(() => {
     setUsername(props.route.params.username);
   }, []);
-
-  const onFollowsPress = useCallback(
-    (type: string) => {
-      if (user === null) return;
-      props.navigation.push('Follows', {
-        type: type,
-        count: user[type],
-        name: user.name,
-        login: user.login,
-      });
-    },
-    [user],
-  );
 
   const onRefresh = useCallback(() => {
     refreshProfile();
@@ -50,6 +38,7 @@ function Profile(this: any, props: any): JSX.Element {
         <GitHubUser
           user={user}
           error={error}
+          loading={loading}
           onFollowerPress={onFollowsPress.bind(this, 'followers')}
           onFollowingPress={onFollowsPress.bind(this, 'following')}
         />
