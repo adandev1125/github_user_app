@@ -1,5 +1,8 @@
 # Speer Technologies React Native assessment
 I created an Android App on Windows for this assessment.
+It took 6~7 hours to complete.
+* 30 min: Setup Environments.
+* 6h 35min: Did assessments.
 
 ## Overview
 
