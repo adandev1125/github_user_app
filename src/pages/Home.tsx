@@ -1,64 +1,43 @@
-import axios from 'axios';
 import React, {useCallback, useState} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  View,
-} from 'react-native';
+import {RefreshControl, ScrollView, StyleSheet, View} from 'react-native';
 import {GitHubUser} from '../components/GithubUser';
+import {DefaultPageWrapper} from '../components/PageWrappers';
 import {DefaultTextIinput} from '../components/TextInputs';
-import {githubHeader} from '../config/api';
+import {colors} from '../config/colors';
+import {useGithubProfileApi} from '../hooks/api';
 
-function Home(props: any): JSX.Element {
-  const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(null);
-  const [error, setError] = useState('');
+function Home(this: any, props: any): JSX.Element {
+  const [username, setUsername] = useState('');
+  const {loading, user, error} = useGithubProfileApi(username);
 
   const onChangeUsername = useCallback((username: string) => {
-    fetchData(username).then();
+    setUsername(username);
   }, []);
 
-  const onFollowerPress = useCallback(() => {
-    props.navigation.push('Followers');
-  }, []);
-  const onFollowingPress = useCallback(() => {
-    props.navigation.push('Following');
-  }, []);
-
-  const fetchData = async (username: string) => {
-    setLoading(true);
-    setUser(null);
-    setError('');
-
-    if (username.length > 0) {
-      try {
-        const {data} = await axios.get(
-          `https://api.github.com/users/${username}`,
-          githubHeader,
-        );
-        setUser(data);
-      } catch (error: any) {
-        if (error.response.status === 404) {
-          setError('Not found');
-        } else {
-          setError(error.message);
-        }
-      }
-    }
-
-    setLoading(false);
-  };
+  const onFollowsPress = useCallback(
+    (type: string) => {
+      if (user === null) return;
+      props.navigation.push('Follows', {
+        type: type,
+        count: user[type],
+        name: user.name,
+        login: user.login,
+      });
+    },
+    [user],
+  );
 
   return (
-    <SafeAreaView style={styles.background}>
-      <StatusBar
-        barStyle={'dark-content'}
-        backgroundColor={styles.background.backgroundColor}
-      />
-
-      <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false}>
+    <DefaultPageWrapper>
+      <ScrollView
+        style={{flex: 1}}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            progressBackgroundColor={colors.gray}
+            refreshing={loading}
+          />
+        }>
         <View style={{flexDirection: 'row', marginBottom: 50}}>
           <DefaultTextIinput
             afterDelay={500}
@@ -69,27 +48,14 @@ function Home(props: any): JSX.Element {
         </View>
 
         <GitHubUser
-          loading={loading}
           user={user}
           error={error}
-          onFollowerPress={onFollowerPress}
-          onFollowingPress={onFollowingPress}
+          onFollowerPress={onFollowsPress.bind(this, 'followers')}
+          onFollowingPress={onFollowsPress.bind(this, 'following')}
         />
       </ScrollView>
-    </SafeAreaView>
+    </DefaultPageWrapper>
   );
 }
-
-const styles = StyleSheet.create({
-  background: {
-    backgroundColor: 'white',
-    flex: 1,
-    paddingTop: 30,
-    paddingHorizontal: 20,
-  },
-  text: {
-    fontSize: 16,
-  },
-});
 
 export default Home;

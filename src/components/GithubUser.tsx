@@ -21,16 +21,10 @@ function FCountButton(props: any) {
 
 export function GitHubUser(props: {
   error: string;
-  loading: boolean;
   user: any;
   onFollowerPress: Function;
   onFollowingPress: Function;
 }): JSX.Element {
-  console.log(props);
-  if (props.loading) {
-    return <ActivityIndicator color={'#555555'} size={40} />;
-  }
-
   if (props.error.length > 0) {
     return (
       <DefaultText style={{alignSelf: 'center', color: '#888888'}}>
@@ -77,4 +71,21 @@ export function GitHubUser(props: {
   }
 
   return <></>;
+}
+
+export function GitHubUserItem(props: {user: any}): JSX.Element {
+  return (
+    <TouchableOpacity
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+      }}>
+      <Image
+        source={{uri: props.user.avatar_url}}
+        style={{width: 50, height: 50, marginRight: 20, borderRadius: 25}}
+      />
+      <DefaultText>{props.user.login}</DefaultText>
+    </TouchableOpacity>
+  );
 }

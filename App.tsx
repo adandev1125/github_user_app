@@ -18,8 +18,16 @@ function App(): JSX.Element {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Followers" component={Follows} />
-        <Stack.Screen name="Following" component={Follows} />
+        <Stack.Screen
+          name="Follows"
+          component={Follows}
+          options={({route}) => {
+            const followsParams = route.params as any;
+            return {
+              title: `${followsParams?.name}'s ${followsParams?.type} (${followsParams.count})`,
+            };
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
