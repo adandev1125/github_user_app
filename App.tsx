@@ -10,6 +10,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
 import Follows from './src/pages/Follows';
 import Home from './src/pages/Home';
+import Profile from './src/pages/Profile';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,6 +26,16 @@ function App(): JSX.Element {
             const followsParams = route.params as any;
             return {
               title: `${followsParams?.name}'s ${followsParams?.type} (${followsParams.count})`,
+            };
+          }}
+        />
+        <Stack.Screen
+          name="Profile"
+          component={Profile}
+          options={({route}) => {
+            const followsParams = route.params as any;
+            return {
+              title: `${followsParams?.username}'s profile`,
             };
           }}
         />

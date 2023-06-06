@@ -1,17 +1,16 @@
-import React, {useCallback, useState} from 'react';
-import {RefreshControl, ScrollView, View} from 'react-native';
+import React, {useCallback, useState, useEffect} from 'react';
+import {RefreshControl, ScrollView} from 'react-native';
 import {GitHubUser} from '../components/GithubUser';
 import {DefaultPageWrapper} from '../components/PageWrappers';
-import {DefaultTextIinput} from '../components/TextInputs';
 import {colors} from '../config/colors';
 import {useGithubProfileApi} from '../hooks/api';
 
-function Home(this: any, props: any): JSX.Element {
+function Profile(this: any, props: any): JSX.Element {
   const [username, setUsername] = useState('');
   const {loading, user, error} = useGithubProfileApi(username);
 
-  const onChangeUsername = useCallback((username: string) => {
-    setUsername(username);
+  useEffect(() => {
+    setUsername(props.route.params.username);
   }, []);
 
   const onFollowsPress = useCallback(
@@ -38,15 +37,6 @@ function Home(this: any, props: any): JSX.Element {
             refreshing={loading}
           />
         }>
-        <View style={{flexDirection: 'row', marginBottom: 50}}>
-          <DefaultTextIinput
-            afterDelay={500}
-            maxLength={50}
-            placeholder={'Enter GitHub username. (ex: adan)'}
-            onAfterChangeText={onChangeUsername}
-          />
-        </View>
-
         <GitHubUser
           user={user}
           error={error}
@@ -58,4 +48,4 @@ function Home(this: any, props: any): JSX.Element {
   );
 }
 
-export default Home;
+export default Profile;

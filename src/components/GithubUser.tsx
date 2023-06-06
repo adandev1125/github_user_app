@@ -1,12 +1,6 @@
-import {
-  ActivityIndicator,
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {DefaultText, BigText, LargeText} from './Texts';
+import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {colors} from '../config/colors';
+import {BigText, DefaultText, LargeText} from './Texts';
 
 function FCountButton(props: any) {
   return (
@@ -41,11 +35,13 @@ export function GitHubUser(props: {
           style={{width: 200, height: 200, borderRadius: 100, marginBottom: 30}}
         />
 
-        <LargeText style={{fontWeight: 'bold', marginBottom: 4}}>
+        <LargeText
+          style={{fontWeight: 'bold', marginBottom: 4, textAlign: 'center'}}>
           {props.user.name}
         </LargeText>
 
-        <BigText style={{color: colors.gray, marginBottom: 20}}>
+        <BigText
+          style={{color: colors.gray, marginBottom: 20, textAlign: 'center'}}>
           {props.user.login}
         </BigText>
 
@@ -73,19 +69,22 @@ export function GitHubUser(props: {
   return <></>;
 }
 
-export function GitHubUserItem(props: {user: any}): JSX.Element {
+export function GitHubUserItem(props: any): JSX.Element {
   return (
-    <TouchableOpacity
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 20,
-      }}>
+    <TouchableOpacity style={githubUserItemStyles.root} onPress={props.onPress}>
       <Image
         source={{uri: props.user.avatar_url}}
-        style={{width: 50, height: 50, marginRight: 20, borderRadius: 25}}
+        style={githubUserItemStyles.avatar}
       />
       <DefaultText>{props.user.login}</DefaultText>
     </TouchableOpacity>
   );
 }
+const githubUserItemStyles = StyleSheet.create({
+  root: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  avatar: {width: 50, height: 50, marginRight: 20, borderRadius: 25},
+});

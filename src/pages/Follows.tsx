@@ -1,60 +1,39 @@
-import axios from 'axios';
-import React, {useEffect, useState, useRef, useCallback} from 'react';
-import {
-  TouchableOpacity,
-  Image,
-  FlatList,
-  SafeAreaView,
-  RefreshControl,
-  StatusBar,
-  StyleSheet,
-  ToastAndroid,
-} from 'react-native';
-import {githubHeader} from '../config/api';
-import {colors} from '../config/colors';
-import {DefaultText} from '../components/Texts';
-import {GitHubUserItem} from '../components/GithubUser';
+import React, {useCallback, useState} from 'react';
+import {FlatList, RefreshControl} from 'react-native';
 import {DefaultButton} from '../components/Buttons';
+import {GitHubUserItem} from '../components/GithubUser';
 import {DefaultPageWrapper} from '../components/PageWrappers';
+import {colors} from '../config/colors';
+import {useGithubFollowsApi} from '../hooks/api';
 
-function Follows(props: any): JSX.Element {
-  const [loading, setLoading] = useState(false);
-  const [users, setUsers] = useState<any>([]);
-
-  const pageNumber = useRef(1);
-
-  useEffect(() => {
-    const {login: username, type} = props.route.params;
-    fetchData(username, type, pageNumber.current);
-  }, []);
+function Follows(this: any, props: any): JSX.Element {
+  const [pageNumber, setPageNumber] = useState(1);
+  const {loading, users} = useGithubFollowsApi(
+    props.route.params.login,
+    props.route.params.type,
+    pageNumber,
+  );
 
   const onLoadMorePress = useCallback(() => {
-    pageNumber.current++;
-    const {login: username, type} = props.route.params;
-    fetchData(username, type, pageNumber.current);
+    setPageNumber(pageNumber + 1);
   }, [users]);
 
-  const fetchData = async (
-    username: string,
-    type: string,
-    pageNumber: number,
-  ) => {
-    setLoading(true);
+  const onUserPress = useCallback((user: any) => {
+    props.navigation.push('Profile', {username: user.login});
+  }, []);
 
-    try {
-      const {data} = await axios.get(
-        `https://api.github.com/users/${username}/${type}`,
-        {
-          params: {page: pageNumber},
-          ...githubHeader,
-        },
+  const renderFooterItem = () => {
+    if (loading) {
+      return <></>;
+    } else {
+      return (
+        <DefaultButton
+          style={{alignSelf: 'center', marginBottom: 20}}
+          onPress={onLoadMorePress}>
+          Load More
+        </DefaultButton>
       );
-      setUsers([...users, ...data]);
-    } catch (error: any) {
-      ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -63,20 +42,10 @@ function Follows(props: any): JSX.Element {
         data={users}
         showsVerticalScrollIndicator={false}
         keyExtractor={item => item.login}
-        renderItem={({item}) => <GitHubUserItem user={item} />}
-        ListFooterComponent={() => {
-          if (loading) {
-            return <></>;
-          } else {
-            return (
-              <DefaultButton
-                style={{alignSelf: 'center', marginBottom: 20}}
-                onPress={onLoadMorePress}>
-                Load More
-              </DefaultButton>
-            );
-          }
-        }}
+        renderItem={({item}) => (
+          <GitHubUserItem user={item} onPress={onUserPress.bind(this, item)} />
+        )}
+        ListFooterComponent={renderFooterItem}
         refreshControl={
           <RefreshControl
             progressBackgroundColor={colors.gray}

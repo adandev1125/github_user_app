@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {useState, useEffect} from 'react';
+import {ToastAndroid} from 'react-native';
 import {githubHeader} from '../config/api';
 
 export const useGithubProfileApi = (username: string) => {
@@ -36,4 +37,38 @@ export const useGithubProfileApi = (username: string) => {
   }, [username]);
 
   return {loading, user, error};
+};
+
+export const useGithubFollowsApi = (
+  username: string,
+  type: string,
+  pageNumber: number,
+) => {
+  const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState<any>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+
+      try {
+        const {data} = await axios.get(
+          `https://api.github.com/users/${username}/${type}`,
+          {
+            params: {page: pageNumber},
+            ...githubHeader,
+          },
+        );
+        setUsers([...users, ...data]);
+      } catch (error: any) {
+        ToastAndroid.show(error.message, ToastAndroid.LONG);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [username, type, pageNumber]);
+
+  return {loading, users};
 };
