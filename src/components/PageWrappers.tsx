@@ -1,6 +1,12 @@
 import {StyleSheet, SafeAreaView, StatusBar} from 'react-native';
 
-export function DefaultPageWrapper(props: any): JSX.Element {
+// Default page wrapper component for all pages
+interface DefaultPageWrapperProps {
+  children?: any;
+}
+export function DefaultPageWrapper(
+  props: DefaultPageWrapperProps,
+): JSX.Element {
   return (
     <SafeAreaView style={styles.defaultPageBackground}>
       <StatusBar

@@ -5,18 +5,20 @@ import {githubHeader} from '../config/api';
 import {useDispatch, useSelector} from 'react-redux';
 import cacheSlice from '../reducers/cache';
 
+// Custom hook for fetching and showing user info from GitHub
 export const useGithubProfileApi = (username: string, navigation: any) => {
-  const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<any | null>(null);
-  const [error, setError] = useState('');
-  const [shouldRefresh, refresh] = useState({});
+  const [loading, setLoading] = useState(false); // Loading flag variable to display loading indicator
+  const [user, setUser] = useState<any | null>(null); // Fetched user info, it error occurs, it is set to null
+  const [error, setError] = useState(''); // Error message occured while fetching user info
+  const [shouldRefresh, refresh] = useState({}); // To refresh. Used for pull-to-refresh feature
 
-  const previousShouldRefresh = useRef({});
+  const previousShouldRefresh = useRef({}); // Saves previous shouldRefresh state variable
 
-  const cache = useSelector((state: any) => state.cache.profileCache);
-  const dispatch = useDispatch();
+  const cache = useSelector((state: any) => state.cache.profileCache); // Profile cache reducer
+  const dispatch = useDispatch(); // dispatch action to update Profile cache reducer
 
   const onFollowsPress = useCallback(
+    // Callback of pressing followers or following button
     (type: string) => {
       if (user === null) return;
       navigation.push('Follows', {
@@ -29,33 +31,41 @@ export const useGithubProfileApi = (username: string, navigation: any) => {
     [user],
   );
 
+  const onRefresh = useCallback(() => {
+    refresh({});
+  }, [shouldRefresh]);
+
   useEffect(() => {
     const fetchData = async () => {
-      const cachedUser = cache[username];
+      const cachedUser = cache[username]; // Get cached user info from redux store
 
       const shouldRefreshChanged =
-        previousShouldRefresh.current !== shouldRefresh;
+        previousShouldRefresh.current !== shouldRefresh; // Get user pulled to refresh
 
       const mustFetch =
         cachedUser === undefined ||
         (Date.now() - cachedUser.time) / 6e6 > 10 ||
-        shouldRefreshChanged;
+        shouldRefreshChanged; // Cache validation and check pull-to-refresh
 
       if (shouldRefreshChanged) {
+        // Update saved shouldRefresh state variable
         previousShouldRefresh.current = shouldRefresh;
       }
 
       if (mustFetch) {
+        // If user info must be fetched
         setLoading(true);
         setUser(null);
         setError('');
 
         try {
+          // Fetch user info from GitHub
           const {data} = await axios.get(
             `https://api.github.com/users/${username}`,
             githubHeader,
           );
 
+          // Save to cache
           dispatch(
             cacheSlice.actions.updateProfileCache({
               username: username,
@@ -63,17 +73,20 @@ export const useGithubProfileApi = (username: string, navigation: any) => {
             }),
           );
 
+          // Show data
           setUser(data);
         } catch (error: any) {
+          console.log(error);
           if (error.response.status === 404) {
             setError('Not found');
           } else {
             setError(error.message);
           }
         } finally {
-          // setLoading(false);
+          setLoading(false);
         }
       } else {
+        // Display user info with cached data
         setUser(cachedUser);
       }
     };
@@ -85,13 +98,12 @@ export const useGithubProfileApi = (username: string, navigation: any) => {
     loading,
     user,
     error,
-    refresh: () => {
-      refresh({});
-    },
     onFollowsPress,
+    onRefresh,
   };
 };
 
+// Custom hook for fetching and showing followers or following of a GitHub user
 export const useGithubFollowsApi = (
   username: string,
   type: string,
@@ -99,6 +111,7 @@ export const useGithubFollowsApi = (
 ) => {
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<any>([]);
+  const [showLoadMore, setShowLoadMore] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -108,15 +121,14 @@ export const useGithubFollowsApi = (
         const {data} = await axios.get(
           `https://api.github.com/users/${username}/${type}`,
           {
-            params: {page: pageNumber},
+            params: {page: pageNumber, per_page: 30},
             ...githubHeader,
           },
         );
-        if (data.length === 0) {
-          ToastAndroid.show('Nothing to show', ToastAndroid.LONG);
-        } else {
-          setUsers([...users, ...data]);
+        if (data.length < 30) {
+          setShowLoadMore(false);
         }
+        setUsers([...users, ...data]);
       } catch (error: any) {
         ToastAndroid.show(error.message, ToastAndroid.LONG);
       } finally {
@@ -127,5 +139,5 @@ export const useGithubFollowsApi = (
     fetchData();
   }, [username, type, pageNumber]);
 
-  return {loading, users};
+  return {loading, users, showLoadMore};
 };

@@ -8,7 +8,7 @@ import {useGithubFollowsApi} from '../hooks/api';
 
 function Follows(this: any, props: any): JSX.Element {
   const [pageNumber, setPageNumber] = useState(1);
-  const {loading, users} = useGithubFollowsApi(
+  const {loading, users, showLoadMore} = useGithubFollowsApi(
     props.route.params.login,
     props.route.params.type,
     pageNumber,
@@ -23,7 +23,7 @@ function Follows(this: any, props: any): JSX.Element {
   }, []);
 
   const renderFooterItem = () => {
-    if (users.length === 0) {
+    if (users.length === 0 || !showLoadMore) {
       return <></>;
     } else {
       return (

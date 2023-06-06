@@ -7,21 +7,14 @@ import {useGithubProfileApi} from '../hooks/api';
 
 function Profile(this: any, props: any): JSX.Element {
   const [username, setUsername] = useState('');
-  const {
-    loading,
-    user,
-    error,
-    refresh: refreshProfile,
-    onFollowsPress,
-  } = useGithubProfileApi(username, props.navigation);
+  const {loading, user, error, onFollowsPress, onRefresh} = useGithubProfileApi(
+    username,
+    props.navigation,
+  );
 
   useEffect(() => {
     setUsername(props.route.params.username);
   }, []);
-
-  const onRefresh = useCallback(() => {
-    refreshProfile();
-  }, [refreshProfile]);
 
   return (
     <DefaultPageWrapper>

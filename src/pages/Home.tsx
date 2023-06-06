@@ -2,27 +2,20 @@ import React, {useCallback, useState} from 'react';
 import {RefreshControl, ScrollView, View} from 'react-native';
 import {GitHubUser} from '../components/GithubUser';
 import {DefaultPageWrapper} from '../components/PageWrappers';
-import {DefaultTextIinput} from '../components/TextInputs';
+import {DefaultTextIinput} from '../components/TextInput';
 import {colors} from '../config/colors';
 import {useGithubProfileApi} from '../hooks/api';
 
 function Home(this: any, props: any): JSX.Element {
   const [username, setUsername] = useState('');
-  const {
-    loading,
-    user,
-    error,
-    refresh: refreshProfile,
-    onFollowsPress,
-  } = useGithubProfileApi(username, props.navigation);
+  const {loading, user, error, onFollowsPress, onRefresh} = useGithubProfileApi(
+    username,
+    props.navigation,
+  );
 
   const onChangeUsername = useCallback((username: string) => {
     setUsername(username);
   }, []);
-
-  const onRefresh = useCallback(() => {
-    refreshProfile();
-  }, [refreshProfile]);
 
   return (
     <DefaultPageWrapper>

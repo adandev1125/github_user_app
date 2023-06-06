@@ -9,32 +9,43 @@ import store from './src/store';
 
 const Stack = createNativeStackNavigator();
 
+const routes = [
+  {name: 'Search GitHub User', component: Home},
+  {
+    name: 'Follows',
+    component: Follows,
+    option: (option: {route: any}) => {
+      const followsParams = option.route.params as any;
+      return {
+        title: `${followsParams?.name}'s ${followsParams?.type} (${followsParams.count})`,
+      };
+    },
+  },
+  {
+    name: 'Profile',
+    component: Profile,
+    option: (option: {route: any}) => {
+      const followsParams = option.route.params as any;
+      return {
+        title: `${followsParams?.username}'s profile`,
+      };
+    },
+  },
+];
+
 function App(): JSX.Element {
   return (
     <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Search GitHub User">
-          <Stack.Screen name="Search GitHub User" component={Home} />
-          <Stack.Screen
-            name="Follows"
-            component={Follows}
-            options={({route}) => {
-              const followsParams = route.params as any;
-              return {
-                title: `${followsParams?.name}'s ${followsParams?.type} (${followsParams.count})`,
-              };
-            }}
-          />
-          <Stack.Screen
-            name="Profile"
-            component={Profile}
-            options={({route}) => {
-              const followsParams = route.params as any;
-              return {
-                title: `${followsParams?.username}'s profile`,
-              };
-            }}
-          />
+          {routes.map(r => (
+            <Stack.Screen
+              key={r.name}
+              name={r.name}
+              component={r.component}
+              options={r.option}
+            />
+          ))}
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

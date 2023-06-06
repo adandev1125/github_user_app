@@ -1,7 +1,19 @@
-import {StyleSheet, TouchableOpacity} from 'react-native';
-import {DefaultText} from './Texts';
+import {
+  GestureResponderEvent,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
+import {colors} from '../config/colors';
+import {DefaultText} from './Text';
 
-export function DefaultButton(props: any): JSX.Element {
+// Default button component
+interface DefaultButtonProps {
+  style?: any;
+  disabled?: boolean;
+  children?: any;
+  onPress?: (event: GestureResponderEvent) => void;
+}
+export function DefaultButton(props: DefaultButtonProps): JSX.Element {
   return (
     <TouchableOpacity
       style={[
@@ -20,7 +32,7 @@ export function DefaultButton(props: any): JSX.Element {
 
 const buttonStyles = StyleSheet.create({
   default: {
-    backgroundColor: '#6828ec',
+    backgroundColor: colors.default,
     paddingHorizontal: 30,
     paddingVertical: 10,
     borderRadius: 100,

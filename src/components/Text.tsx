@@ -1,6 +1,11 @@
 import {StyleSheet, Text} from 'react-native';
 
-export function DefaultText(props: any): JSX.Element {
+// Default sized text (size: 16)
+interface DefaultTextProps {
+  style?: any;
+  children?: any;
+}
+export function DefaultText(props: DefaultTextProps): JSX.Element {
   return (
     <Text style={[textStyles.default, textStyles.black, props.style]}>
       {props.children}
@@ -8,7 +13,8 @@ export function DefaultText(props: any): JSX.Element {
   );
 }
 
-export function BigText(props: any): JSX.Element {
+// Big sized text (size: 24)
+export function BigText(props: DefaultTextProps): JSX.Element {
   return (
     <Text style={[textStyles.big, textStyles.black, props.style]}>
       {props.children}
@@ -16,7 +22,8 @@ export function BigText(props: any): JSX.Element {
   );
 }
 
-export function LargeText(props: any): JSX.Element {
+// Large sized text (size: 36)
+export function LargeText(props: DefaultTextProps): JSX.Element {
   return (
     <Text style={[textStyles.large, textStyles.black, props.style]}>
       {props.children}

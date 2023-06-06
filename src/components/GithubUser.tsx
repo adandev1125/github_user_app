@@ -1,9 +1,22 @@
-import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
-import {colors} from '../config/colors';
-import {BigText, DefaultText, LargeText} from './Texts';
+import {
+  GestureResponderEvent,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import {colors} from '../config/colors';
+import {BigText, DefaultText, LargeText} from './Text';
 
-function FCountButton(props: any) {
+// Button component displaying following and followers count
+interface FCountButtonProps {
+  style?: any;
+  count: number;
+  label: string;
+  onPress: (event: GestureResponderEvent) => void;
+}
+function FCountButton(props: FCountButtonProps) {
   return (
     <TouchableOpacity
       style={[{flexDirection: 'row'}, props.style]}
@@ -14,57 +27,59 @@ function FCountButton(props: any) {
   );
 }
 
-export function GitHubUser(props: {
+// Github user profile component,
+// showing avatar, name, username, bio, and following & followers count
+interface GitHubUserProps {
   error: string;
   user: any;
   loading: boolean;
-  onFollowerPress: Function;
-  onFollowingPress: Function;
-}): JSX.Element {
+  onFollowerPress: (event: GestureResponderEvent) => void;
+  onFollowingPress: (event: GestureResponderEvent) => void;
+}
+export function GitHubUser(props: GitHubUserProps): JSX.Element {
+  // Render skeleton screen while loading
   if (props.loading) {
     return (
       <SkeletonPlaceholder>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <View style={{width: 50, height: 50, borderRadius: 25}} />
-          <View style={{marginLeft: 20}}>
-            <View style={{width: 120, height: 20, borderRadius: 4}} />
-            <View
-              style={{marginTop: 6, width: 80, height: 20, borderRadius: 4}}
-            />
+        <View style={githubUserStyles.root}>
+          <View style={githubUserStyles.avatar} />
+
+          <View style={githubUserStyles.namePlaceholder} />
+          <View style={githubUserStyles.usernamePlaceholder} />
+          <View style={githubUserStyles.bioPlaceholder} />
+
+          <View style={{flexDirection: 'row', alignSelf: 'center'}}>
+            <View style={githubUserStyles.followerPlaceholder} />
+            <View style={githubUserStyles.followingPlaceholder} />
           </View>
         </View>
       </SkeletonPlaceholder>
     );
   }
+
+  // If error occurs, display the error string
   if (props.error.length > 0) {
     return (
-      <DefaultText style={{alignSelf: 'center', color: '#888888'}}>
+      <DefaultText style={{alignSelf: 'center', color: colors.gray}}>
         {props.error}
       </DefaultText>
     );
   }
 
+  // Render user profile
   if (props.user != null) {
     return (
-      <View style={{alignItems: 'center'}}>
+      <View style={githubUserStyles.root}>
         <Image
           source={{uri: props.user.avatar_url}}
-          style={{width: 200, height: 200, borderRadius: 100, marginBottom: 30}}
+          style={githubUserStyles.avatar}
         />
 
-        <LargeText
-          style={{fontWeight: 'bold', marginBottom: 4, textAlign: 'center'}}>
-          {props.user.name}
-        </LargeText>
+        <LargeText style={githubUserStyles.name}>{props.user.name}</LargeText>
 
-        <BigText
-          style={{color: colors.gray, marginBottom: 20, textAlign: 'center'}}>
-          {props.user.login}
-        </BigText>
+        <BigText style={githubUserStyles.username}>{props.user.login}</BigText>
 
-        <DefaultText style={{marginBottom: 20, textAlign: 'center'}}>
-          {props.user.bio}
-        </DefaultText>
+        <DefaultText style={githubUserStyles.bio}>{props.user.bio}</DefaultText>
 
         <View style={{flexDirection: 'row', alignSelf: 'center'}}>
           <FCountButton
@@ -85,8 +100,54 @@ export function GitHubUser(props: {
 
   return <></>;
 }
+const githubUserStyles = StyleSheet.create({
+  root: {alignItems: 'center'},
+  avatar: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    marginBottom: 30,
+  },
+  namePlaceholder: {
+    width: 200,
+    height: 48.5,
+    marginBottom: 4,
+    borderRadius: 100,
+  },
+  name: {fontWeight: 'bold', marginBottom: 4, textAlign: 'center'},
+  usernamePlaceholder: {
+    width: 200,
+    height: 32.5,
+    marginBottom: 20,
+    borderRadius: 100,
+  },
+  username: {color: colors.gray, marginBottom: 20, textAlign: 'center'},
+  bioPlaceholder: {
+    width: 300,
+    height: 21.5,
+    marginBottom: 20,
+    borderRadius: 100,
+  },
+  bio: {marginBottom: 20, textAlign: 'center'},
+  followerPlaceholder: {
+    width: 100,
+    height: 21.5,
+    marginRight: 20,
+    borderRadius: 100,
+  },
+  followingPlaceholder: {width: 100, height: 21.5, borderRadius: 100},
+});
 
-export function GitHubUserItem(props: any): JSX.Element {
+// Component for showing GitHub users on list
+// Displays avatar and username
+interface GitHubUserItemProps {
+  user: {
+    avatar_url: string;
+    login: string;
+  };
+  onPress: (event: GestureResponderEvent) => void;
+}
+export function GitHubUserItem(props: GitHubUserItemProps): JSX.Element {
   return (
     <TouchableOpacity style={githubUserItemStyles.root} onPress={props.onPress}>
       <Image
