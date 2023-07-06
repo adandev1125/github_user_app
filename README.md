@@ -1,17 +1,3 @@
-# Speer Technologies React Native assessment
-I created an Android App on Windows for this assessment.
-It took 6~7 hours to complete.
-* 30 min: Setup Environments.
-* 6h 35min: Did assessments.
-
-## Overview
-
-The goal of this assessment is to build a basic React Native application which demonstrates common tasks such as fetching data, parsing model entities from JSON, UI, and navigation.
-
-### Requirements
-
-For this asessment you'll need to familiarize yourself with parts of the [GitHub REST API](https://docs.github.com/en/rest). The required features we'd like to see built are:
-
 1. A search bar that enables us to fetch GitHub user profiles by username: ✅
     - If no user exists with the username provided, present a "Not found" view ✅
     - If the user exists, present a view with that user's: ✅
